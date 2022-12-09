@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 """This module defines a class to manage file storage for hbnb clone"""
 import json
-from models.state import State
-from models.city import City
 
 
 class FileStorage:
@@ -10,16 +8,17 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
+    #def all(self)
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
+        if (cls == None):
+            return FileStorage.__objects
         new_dict = {}
-        if cls:
-            for key in FileStorage.__objects.keys():
-                if key.split('.')[0] == cls.__name__:
-                    new_dict[key] = FileStorage.__objects[key]
-            return new_dict
-
-        return FileStorage.__objects
+        for key, value in FileStorage.__objects.items():
+            #if type(value) == cls:
+            if (value.__class__ == cls):
+                new_dict[key] = value
+        return (new_dict)
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -33,16 +32,6 @@ class FileStorage:
             for key, val in temp.items():
                 temp[key] = val.to_dict()
             json.dump(temp, f)
-
-# Update
-    def delete(self, obj=None):
-        """Delete object from __objects"""
-        if obj is None:
-            return
-
-        key_obj = obj.to_dict()['__class__'] + '.' + obj.id
-        if key_obj in type(self).__objects.keys():
-            del type(self).__objects[key_obj]
 
     def reload(self):
         """Loads storage dictionary from file"""
@@ -64,6 +53,16 @@ class FileStorage:
             with open(FileStorage.__file_path, 'r') as f:
                 temp = json.load(f)
                 for key, val in temp.items():
-                    self.all()[key] = classes[val['__class__']](**val)
+                        self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
+
+
+    def delete(self, obj=None):
+        """Method to delete class"""
+        if (obj == None):
+            pass
+
+        if (obj in FileStorage.__objects.values()):
+             key = obj.__class__.__name__ + "." + obj.id
+             del(FileStorage.__objects[key])
