@@ -60,6 +60,7 @@ def deploy():
         return do_deploy(archive_p)
     return false
 
+
 def do_clean(number=0):
     """Gets rid of older versions"""
     number = int(number)
@@ -70,4 +71,5 @@ def do_clean(number=0):
 
     local('cd versions ; ls -t -r | head -n -{} | xargs rm -rf'.format(number))
     path = '/data/web_static/releases'
-    run('cd {} ; ls -t -r | head -n -{} | xargs sudo rm -rf'.format(path, number))
+    run('cd {} ; ls -t -r | head -n -{} | xargs sudo rm -rf'
+        .format(path, number))
