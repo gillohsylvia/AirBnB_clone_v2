@@ -28,7 +28,7 @@ else
 fi
 
 # index.html message
-sudo echo "Welcome, this is $(hostname) server" > /data/web_static/releases/test/index.html
+sudo echo "Welcome, this is $(hostname) server" |sudo tee /data/web_static/releases/test/index.html
 
 # creates symbolic link
 #if [ -d "/data/web_static/current" ]
