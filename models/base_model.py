@@ -21,27 +21,67 @@ class BaseModel:
 
     def __init__(self, *args, **kwargs):
         """Instatntiates a new model"""
+        #if not kwargs:
+            # from models import storage
+        self.id = str(uuid.uuid4())
+        self.created_at = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
+            # storage.new(self)
+        if kwargs:
+            if kwargs.get('id', None) is None:
+                # self.created_at = datetime.utcnow()
+                # self.updated_at = datetime.utcnow()
+                self.id = str(uuid.uuid4())
 
+            if kwargs.get('created_at', None) is not None:
+                kwargs['created_at'] = datetime.\
+                    strptime(kwargs['created_at'],
+                             '%Y-%m-%dT%H:%M:%S.%f')
+
+            if kwargs.get('updated_at', None) is not None:
+                kwargs['updated_at'] = datetime.\
+                    strptime(kwargs['updated_at'],
+                             '%Y-%m-%dT%H:%M:%S.%f')
+
+            if kwargs.get('__class__', None) is not None:
+                del kwargs['__class__']
+
+            self.__dict__.update(kwargs)
+        """self.id = str(uuid.uuid4())
         if not kwargs:
             from models import storage
-            self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
 
         else:
+            if kwargs.get("created_at"):
+                kwargs["created_at"] = datetime.strptime(
+                    kwargs["created_at"], "%Y-%m-%dT%H:%M:%S.%f")
+            else:
+                self.created_at = datetime.now()
+            if kwargs.get("updated_at"):
+                kwargs["updated_at"] = datetime.strptime(
+                    kwargs["updated_at"], "%Y-%m-%dT%H:%M:%S.%f")
+            else:
+                self.updated_at = datetime.now()
+            for key, val in kwargs.items():
+                if "__class__" not in key:
+                    setattr(self, key, val)
             for k, v in kwargs.items():
-                if (k == 'updated_at'):
-                    kwargs['updated_at'] = datetime.strptime(
-                        kwargs['updated_at'], '%Y-%m-%dT%H:%M:%S.%f')
                 if (k == 'created_at'):
                     kwargs['created_at'] = datetime.strptime(
                         kwargs['created_at'], '%Y-%m-%dT%H:%M:%S.%f')
+                if (k == 'updated_at'):
+                    kwargs['updated_at'] = datetime.strptime(
+                        kwargs['updated_at'], '%Y-%m-%dT%H:%M:%S.%f')
             if 'id' not in kwargs.keys():
                 self.id = str(uuid.uuid4())
             if ('__class__' in kwargs.keys()):
                 del kwargs['__class__']
             self.__dict__.update(kwargs)
 
+            for key, value in kwargs.items():
+                setattr(self, key, value)"""
     def __str__(self):
         """Returns a string representation of the instance"""
         cls = (str(type(self)).split('.')[-1]).split('\'')[0]
@@ -72,4 +112,5 @@ class BaseModel:
 
     def delete(self):
         """Delete the current instance from the storage"""
-        storage.delete()
+        from models import storage
+        storage.delete(self)
