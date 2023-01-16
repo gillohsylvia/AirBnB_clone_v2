@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+"""db storage"""
+
 from os import getenv
 from sqlalchemy import create_engine
 from models.base_model import Base
@@ -17,30 +20,38 @@ class DBStorage():
     __session = None
 
     def __init__(self):
+        """init method"""
         user = getenv("HBNB_MYSQL_USER")
         password = getenv("HBNB_MYSQL_PWD")
-        host = getenv("HBNB_MYSQL_HOST") # (here = localhost)
+        host = getenv("HBNB_MYSQL_HOST")  # (here = localhost)
         database = getenv("HBNB_MYSQL_DB")
         env = getenv("HBNB_ENV")
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(user, password, host, database, pool_pre_ping=True))
+        self.__engine = create_engine(
+            'mysql+mysqldb://{}:{}@{}/{}'.format(user, password, host,
+                                                 database, pool_pre_ping=True))
 
         if (env == "test"):
             Base.metadata.drop_all(self.__engine)
-
 
     def all(self, cls=None):
         """ Query on the current database session all objects """
 
         objDict = {}
         if cls is None:
-            classes = {'State': State, 'City': City, 'User': User, 'Place': Place, 'Review': Review, 'Amenity': Amenity}
+            classes = {
+                'State': State,
+                'City': City,
+                'User': User,
+                'Place': Place,
+                'Review': Review,
+                'Amenity': Amenity}
             for key, value in classes.items():
                 objct = self.__session.query(value).all()
                 for obj in objct:
                     key = "{}.{}".format(type(obj).__name__, obj.id)
                     objDict[key] = obj
         else:
-            if type(cls) == str:
+            if isinstance(cls, str):
                 cls = eval(cls)
             objct = self.__session.query(cls)
             for obj in objct:
@@ -49,13 +60,14 @@ class DBStorage():
 
         return objDict
 
-
     def new(self, obj):
-        """add the object to the current database session (self.__session)"""
+        """add the object to the current database session
+        (self.__session)"""
         self.__session.add(obj)
 
     def save(self):
-        """commit all changes of the current database session (self.__session)"""
+        """commit all changes of the current database session
+        (self.__session)"""
         self.__session.commit()
 
     def delete(self, obj=None):
@@ -68,7 +80,8 @@ class DBStorage():
     def reload(self):
         """create all tables in the database"""
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        session_factory = sessionmaker(
+            bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
 

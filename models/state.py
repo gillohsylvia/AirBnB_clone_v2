@@ -8,6 +8,7 @@ from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 from os import getenv
 
+
 class State(BaseModel, Base):
     """ State class """
 
@@ -15,7 +16,7 @@ class State(BaseModel, Base):
     name = Column(String(128), nullable=False)
     cities = relationship('City', backref='state',
                           cascade="all, delete,delete-orphan")
-    
+
     if getenv('HBNB_TYPE_STORAGE') != "db":
         @property
         def cities(self):
