@@ -11,12 +11,18 @@ app.url_map.strict_slashes = False
 def remove_session(self):
     storage.close()
 """
+
+
 @app.route('/states_list')
 def state_list():
     states = storage.all('State')
     return render_template('7-states_list.html', states=states)
+
+
 @app.teardown_appcontext
 def remove_session(self):
     storage.close()
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
