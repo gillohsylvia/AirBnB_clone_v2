@@ -1,13 +1,15 @@
 #!/usr/bin/python3
 """
+flask app
 """
 from flask import Flask
 from flask import render_template
 from models import storage
+
 app = Flask(__name__)
 #app.url_map.strict_slashes = False
 
-@app.route('/states_list', strict_slashes = False)
+@app.route('/states_list', strict_slashes=False)
 def state_list():
     """render list of states"""
     states = storage.all('State')
