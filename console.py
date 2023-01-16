@@ -4,7 +4,6 @@ import cmd
 import sys
 from models.base_model import BaseModel
 from models.__init__ import storage
-#from models import storage
 from models.user import User
 from models.place import Place
 from models.state import State
@@ -20,16 +19,16 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
     classes = {
-               'BaseModel': BaseModel, 'User': User, 'Place': Place,
-               'State': State, 'City': City, 'Amenity': Amenity,
-               'Review': Review
-              }
+        'BaseModel': BaseModel, 'User': User, 'Place': Place,
+        'State': State, 'City': City, 'Amenity': Amenity,
+        'Review': Review
+    }
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
-             'number_rooms': int, 'number_bathrooms': int,
-             'max_guest': int, 'price_by_night': int,
-             'latitude': float, 'longitude': float
-            }
+        'number_rooms': int, 'number_bathrooms': int,
+        'max_guest': int, 'price_by_night': int,
+        'latitude': float, 'longitude': float
+    }
 
     def preloop(self):
         """Prints if isatty is false"""
@@ -119,55 +118,26 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-
-        #elif args not in HBNBCommand.classes:
-        #create State name="California" town="state
-        # args = State name="california"
-        args = args.split()  # return list of args ["State", name="california", town="state"]
+        args = args.split()
         if args[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        class_args = args[0]
-        new_instance = HBNBCommand.classes[class_args]()
+        new_instance = eval(args[0])()
 
-        #print(args[2])
-        kw_args = {}
-        d = len(args)
-        for j in range(1, d):
-            #argd[j] = name="california"
-            param_list = args[j].split("=")  #["name", "Californuia"]
-
-            if ('"' in param_list[1]):
-                p1 = param_list[1].strip('"')
-                if ("_" in p1):
-                    p1 = p1.replace('_', ' ')
-                #setattr(new_instance, param_list[0], p1)
-            elif ('.' in param_list[1]):
-                p1 = float(param_list[1])
-                #setattr(new_instance, param_list[0], p)
+        for f in args[1:]:
+            key = f.split("=")[0]
+            value = f.split("=")[1]
+            if ('_' in value):
+                value = value.replace("_", " ")
+            if ('"' in value):
+                value = value.strip('"')
+            elif ('.' in value):
+                value = float(value)
             else:
-                p1 = int(param_list[1])
-            #kw_args[param_list[0]] = p1
+                value = int(value)
 
-            setattr(new_instance, param_list[0], p1)
-
-        #if (kw_args):
-         #   new_instance = HBNBCommand.classes[class_args](kw_args)
-        #else:
-         #   new_instance = HBNBCommand.classes[class_args]()
-
-            #if '_sa_instance_state' in new_instance.__dict__.keys():
-             #   del new_instance.__dict__["_sa_instance_state"]
-
-
-                #if ('"' in p):
-                    #p1 = p.replace('"', '\')
-
-            #print(param_list)
-            #setattr(new_instance, param_list[0], param_list[1])
-
+        setattr(new_instance, key, value)
         storage.new(new_instance)
-        #storage.save()
         print(new_instance.id)
         storage.save()
 
@@ -250,23 +220,13 @@ class HBNBCommand(cmd.Cmd):
             args = args.split(' ')[0]  # remove possible trailing args
             if args not in HBNBCommand.classes:
                 return
-            #for k, v in storage._FileStorage__objects.items():
-            #print("BEfore the for")
             for k, v in storage.all().items():
                 if k.split('.')[0] == args:
-                    #if '_sa_instance_state' in v.keys():
-                        #del v["_sa_instance_state"]
-                    #print()
-                    #print(v)
-                    #print()
                     print_list.append(str(v))
 
-
         else:
-            #for k, v in storage._FileStorage__objects.items():
             for k, v in storage.all().items():
                 print_list.append(str(v))
-
         print(print_list)
 
     def help_all(self):
@@ -277,7 +237,7 @@ class HBNBCommand(cmd.Cmd):
     def do_count(self, args):
         """Count current number of class instances"""
         count = 0
-        #for k, v in storage.all().items():
+        # for k, v in storage.all().items():
         for k, v in storage._FileStorage__objects.items():
             if args == k.split('.')[0]:
                 count += 1
@@ -374,6 +334,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
