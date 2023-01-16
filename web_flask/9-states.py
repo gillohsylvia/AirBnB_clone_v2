@@ -1,15 +1,15 @@
 #!/usr/bin/python3
 """
+flask script
 """
 from flask import Flask
 from flask import render_template
 from models import storage
 
 app = Flask(__name__)
-app.url_map.strict_slashes = False
 
 
-@app.route('/states')
+@app.route('/states', strict_slashes=False)
 def state():
     states = storage.all('State')
     return render_template('7-states_list.html', states=states)
