@@ -6,10 +6,9 @@ from flask import render_template
 from models import storage
 
 app = Flask(__name__)
-app.url_map.strict_slashes = False
 
 
-@app.route('/cities_by_states')
+@app.route('/cities_by_states', strict_slashes=False)
 def cities_list():
     states = storage.all('State')
     cities = storage.all('City')
