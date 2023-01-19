@@ -2,6 +2,7 @@
 """ Console Module """
 import cmd
 import sys
+import re
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
@@ -113,8 +114,8 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-        """ Create an object of any class"""
+    def do_create(self, arg):
+        """ Create an object of any class
         if not args:
             print("** class name missing **")
             return
@@ -137,8 +138,53 @@ class HBNBCommand(cmd.Cmd):
                 value = int(value)
 
         setattr(new_instance, key, value)
+        storage.save()
         storage.new(new_instance)
         print(new_instance.id)
+        storage.save()"""
+        args = arg.split(' ')
+        if not arg:
+            print("** class name missing **")
+            return
+        elif args[0] not in HBNBCommand.classes:
+            print("** class doesn't exist **")
+            return
+        new_instance = HBNBCommand.classes[args[0]]()
+        # obj_dict = storage.all()
+        obj_dict = {}
+        # get classname and id in this repr <BaseModel.id>
+        clsName_id = "{}.{}".format(args[0], new_instance.id)
+        # obj = obj_dict[clsName_id]
+        obj_dict[clsName_id] = new_instance
+        # dictObj = new_instance.to_dict()
+        dictObj = new_instance.__dict__
+        # dictObj = obj.__dict__
+        if len(args) >= 2:
+            for arg in args:
+                if re.search(r'[=]', arg):
+                    param = arg.split('=')  # <key>=<value>
+                    value = param[1]
+                    if value[:1] == '"' and value[-1:] == '"':
+                        param[1] = param[1].strip('"')
+                        if '"' in param[1]:
+                            param[1] = param[1].replace('"', '\\')
+                        param[1] = str(param[1])
+                        if '_' in value:
+                            param[1] = param[1].replace('_', ' ')
+                    elif '.' in value:
+                        param[1] = float(value)
+                    elif param[1][:1] == '0':
+                        param[1] = str(param[1])
+                    else:
+                        param[1] = int(param[1])
+                    # obj_dict[param[0]] = param[1]
+                    dictObj[param[0]] = param[1]
+
+        # models.storage.new(self)
+        storage.save()
+        storage.new(new_instance)
+        print(new_instance.id)
+        # print(obj_dict)
         storage.save()
 
     def help_create(self):
