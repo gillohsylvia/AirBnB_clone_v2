@@ -1,6 +1,6 @@
 # AirBnB_clone Deploy static
 # Concept
-* CI/CD
+* [CI/CD](CI-CD.md)
 * AirBnB clone
 
 # Background Context
